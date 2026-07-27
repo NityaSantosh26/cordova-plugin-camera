@@ -98,6 +98,7 @@ static NSString* MIME_JPEG    = @"image/jpeg";
 // so we can set it. Skips didReceiveMemoryWarning handling in
 // CDVViewController when a plugin has a pending operation.
 @property (readwrite, assign) BOOL hasPendingOperation;
+@property (atomic, assign) BOOL shouldStopCamera;
 
 @end
 
@@ -236,14 +237,18 @@ static NSString* MIME_JPEG    = @"image/jpeg";
 - (void)stop:(CDVInvokedUrlCommand*)command
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        UIViewController* presentedViewController = self.viewController.presentedViewController;
-        if (presentedViewController == nil) {
+        self.shouldStopCamera = YES;
+
+        UIViewController* activeController = self.cdvUIImagePickerController ?: self.viewController.presentedViewController;
+        if (activeController == nil) {
             CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
             [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
             return;
         }
 
-        [presentedViewController dismissViewControllerAnimated:YES completion:^{
+        UIViewController* dismissTarget = activeController.presentingViewController ?: self.viewController;
+        [dismissTarget dismissViewControllerAnimated:YES completion:^{
+            self.shouldStopCamera = NO;
             self.hasPendingOperation = NO;
             self.cdvUIImagePickerController = nil;
 
@@ -281,6 +286,12 @@ static NSString* MIME_JPEG    = @"image/jpeg";
  */
 - (void)showCameraPicker:(NSString*)callbackId withOptions:(CDVPictureOptions*)pictureOptions
 {
+    if (self.shouldStopCamera) {
+        self.shouldStopCamera = NO;
+        self.hasPendingOperation = NO;
+        return;
+    }
+
     // Use PHPickerViewController for photo library on iOS 14+
     if (@available(iOS 14, *)) {
         // sourceType is PHOTOLIBRARY
@@ -316,6 +327,12 @@ static NSString* MIME_JPEG    = @"image/jpeg";
 {
     // PHPicker must be created and presented on the main thread.
     dispatch_async(dispatch_get_main_queue(), ^{
+        if (self.shouldStopCamera) {
+            self.shouldStopCamera = NO;
+            self.hasPendingOperation = NO;
+            return;
+        }
+
         // Using [PHPickerConfiguration init] instead of
         // [PHPickerConfiguration initWithPhotoLibrary:[PHPhotoLibrary sharedPhotoLibrary]]
         // is more open and lets the picker return items that aren’t PHAssets, like cloud/shared providers,
