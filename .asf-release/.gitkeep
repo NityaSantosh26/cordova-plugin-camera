@@ -15,26 +15,8 @@
 # specific language governing permissions and limitations
 # under the License.
 
-* text eol=lf
-
-# These files are binary and should be left untouched
-# (binary is a macro for -text -diff)
-*.png binary
-*.jpg binary
-*.jpeg binary
-*.gif binary
-*.ico binary
-*.mov binary
-*.mp4 binary
-*.mp3 binary
-*.flv binary
-*.fla binary
-*.swf binary
-*.gz binary
-*.zip binary
-*.7z binary
-*.ttf binary
-*.eot binary
-*.woff binary
-*.pyc binary
-*.pdf binary
+# ---
+# This directory is used as apart of the release process.
+# Package tarballs will be generated in stored temporarily
+# within this directory and should not be commited to repo.
+# ---
