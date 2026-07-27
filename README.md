@@ -106,9 +106,9 @@ To add these entries into the `info.plist`, you can use the `edit-config` tag in
 
 # API Reference <a name="reference"></a>
 
-
 * [camera](#module_camera)
     * [.getPicture(successCallback, errorCallback, options)](#module_camera.getPicture)
+    * [.stop()](#module_camera.stop)
     * [.cleanup()](#module_camera.cleanup)
     * [.onError](#module_camera.onError) : <code>function</code>
     * [.onSuccess](#module_camera.onSuccess) : <code>function</code>
@@ -187,6 +187,31 @@ More examples [here](#camera-getPicture-examples). Quirks [here](#camera-getPict
 ```js
 navigator.camera.getPicture(cameraSuccess, cameraError, cameraOptions);
 ```
+
+<a name="module_camera.stop"></a>
+
+### camera.stop()
+Closes the active camera or photo library picker UI.
+
+__Supported Platforms__
+
+- Android
+- iOS
+
+**Kind**: static method of <code>[camera](#module_camera)</code>
+**Example**
+```js
+navigator.camera.stop(onSuccess, onFail);
+
+function onSuccess() {
+    console.log('Camera stopped successfully.');
+}
+
+function onFail(message) {
+    alert('Failed because: ' + message);
+}
+```
+
 <a name="module_camera.cleanup"></a>
 
 ### camera.cleanup()

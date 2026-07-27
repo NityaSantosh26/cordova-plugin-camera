@@ -152,8 +152,13 @@ cameraExport.getPicture = function (successCallback, errorCallback, options) {
 };
 
 /**
-* Closes the Camera on calling this method
-*/
+ * Closes the active camera or media picker UI.
+ *
+ * __Supported Platforms__
+ *
+ * - Android
+ * - iOS
+ */
 cameraExport.stop = function (successCallback, errorCallback) {
     exec(successCallback, errorCallback, 'Camera', 'stop', []);
 };

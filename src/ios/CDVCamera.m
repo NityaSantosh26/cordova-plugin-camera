@@ -206,13 +206,22 @@ static NSString* toBase64(NSData* data) {
 }
 
 - (void)stop:(CDVInvokedUrlCommand*)command {
-    if (self.pickerController) {
-        NSLog(@"Closing Camera/Photo Library");
-        [self.pickerController dismissViewControllerAnimated:YES completion:^{
-            self.hasPendingOperation = NO;
-            self.pickerController = nil;
-        }];
-    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (self.pickerController) {
+            NSLog(@"Closing Camera/Photo Library");
+            [self.pickerController dismissViewControllerAnimated:YES completion:^{
+                self.hasPendingOperation = NO;
+                self.pickerController = nil;
+
+                CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+                [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+            }];
+            return;
+        }
+
+        CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+        [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+    });
 }
 
 - (void)showCameraPicker:(NSString*)callbackId withOptions:(CDVPictureOptions *) pictureOptions
